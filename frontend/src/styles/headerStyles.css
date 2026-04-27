@@ -1,0 +1,54 @@
+.myheader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+
+    background-color: #0f172a;
+    /* 60% - dark primary */
+    color: #ffffff;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.home_navigation {
+    width: 50%;
+}
+
+.home_navigation ul {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    list-style: none;
+}
+
+.home_navigation a {
+    text-decoration: none;
+    color: #e2e8f0;
+    /* soft readable text */
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+.home_navigation a:hover {
+    color: #38bdf8;
+    /* 10% accent */
+}
+
+/* Special styling for Sign Up (accent focus) */
+.home_navigation ul li:last-child a {
+    background-color: #38bdf8;
+    /* 10% accent */
+    color: #0f172a;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.home_navigation ul li:last-child a:hover {
+    background-color: #e9c50e;
+}
