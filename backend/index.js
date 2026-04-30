@@ -1,110 +1,80 @@
 import express from 'express'
+import pool from './db_connection.js'
 const app = express()
 
-const port = 4000
+const port = 3000
 
-export const products = [
-  {
-    id: 1,
-    title: 'iPhone 14 Pro',
-    description: 'Latest Apple smartphone with A16 chip',
-    price: 1200,
-    discountPercentage: 10,
-    rating: 4.8,
-    stock: 12,
-    brand: 'Apple',
-    thumbnail: 'https://dummyjson.com/image/i/products/1/thumbnail.jpg',
-    tags: ['smartphone', 'apple', 'ios']
-  },
-  {
-    id: 30,
-    title: 'Samsung Galaxy S23',
-    description: 'Flagship Android phone with powerful performance',
-    price: 950,
-    discountPercentage: 8,
-    rating: 4.5,
-    stock: 20,
-    brand: 'Samsung',
-    thumbnail: 'https://dummyjson.com/image/i/products/2/thumbnail.jpg',
-    tags: ['smartphone', 'android']
-  },
-  {
-    id: 3,
-    title: 'MacBook Pro M2',
-    description: 'High-performance laptop for developers',
-    price: 2100,
-    discountPercentage: 5,
-    rating: 4.9,
-    stock: 5,
-    brand: 'Apple',
-    thumbnail: 'https://dummyjson.com/image/i/products/6/thumbnail.png',
-    tags: ['laptop', 'apple', 'developer']
-  },
-  {
-    id: 4,
-    title: 'Nike Air Max',
-    description: 'Comfortable and stylish sneakers',
-    price: 180,
-    discountPercentage: 15,
-    rating: 4.3,
-    stock: 30,
-    brand: 'Nike',
-    thumbnail: 'https://dummyjson.com/image/i/products/10/thumbnail.jpeg',
-    tags: ['shoes', 'fashion']
-  },
-  {
-    id: 5,
-    title: 'Sony WH-1000XM5',
-    description: 'Noise-cancelling wireless headphones',
-    price: 400,
-    discountPercentage: 12,
-    rating: 4.7,
-    stock: 18,
-    brand: 'Sony',
-    thumbnail: 'https://dummyjson.com/image/i/products/8/thumbnail.jpg',
-    tags: ['audio', 'headphones']
+const test = async () => {
+  const [rows] = await pool.query('SELECT NOW()')
+  console.log(rows)
+}
+app.use(express.json())
+test()
+const inserting = async (name, email, password) => {
+  const [
+    result
+  ] = await pool.query(
+    'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
+    [name, email, password]
+  )
+  console.log(result.insertId)
+}
+const deleting = async () => {
+  await pool.query('DELETE FROM users WHERE id = 4')
+}
+app.post('/register', async (req, res) => {
+  const { name, email, password } = req.body
+  if (!name) {
+    return res.send({
+      status: false,
+      message: ' your  name w is required1'
+    })
   }
-]
-app.get('/', (req, res) => {
-  console.log('Received a request at /', req.body)
-  res.send({
-    message: '  producrts retrieved  successfull',
-    success: true,
-    products: products
-  })
-})
-app.delete('/deleteproduct/:productId', (req, res) => {
-  const productId = Number(req.params.productId)
-  const productIndex = products.findIndex(p => p.id === productId)
-
-  if (productIndex === -1) {
-    return res.status(404).send({
-      message: 'Product not found',
-      success: false
+  if (!email) {
+    return res.status(403).send({
+      status: false,
+      message: ' email  email w is required1'
     })
   }
 
-  products.splice(productIndex, 1)
+  if (!password) {
+    return res.send({
+      status: false,
+      message: ' password  password w is required1'
+    })
+  }
+  console.log(
+    ' am signup  and am being cllaed********************************1'
+  )
 
-  res.send({
-    message: 'Product deleted successfully',
-    success: true,
-    products: products
+  const alreadyexist = await finduserByEmail(email)
+
+  if (alreadyexist) {
+    return res.status(409).send({
+      status: false,
+      message: 'user with this email already exist  try  to usae another email'
+    })
+  }
+
+  console.log('***********i have  exceuted  even if there no name******', name)
+  inserting(name, email, password)
+  return res.send({
+    status: true,
+    message: 'succesful registered'
   })
 })
 
-app.post('/addproduct', (req, res) => {
-  const newProduct = req.body
+const finduserByEmail = async email => {
+  console.log(' i have to cka the exisitence of the ', email)
+  const [
+    existingUser
+  ] = await pool.query('SELECT * FROM users WHERE email = ?', [email])
 
-  newProduct.id =
-    products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1
-  products.push(newProduct)
-  res.status(201).send({
-    message: 'Product added successfully',
-    success: true,
-    product: newProduct
-  })
-})
+  if (existingUser.length > 0) {
+    console.log('user exist')
+    return true
+  } else return false
+}
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
