@@ -19,7 +19,11 @@ export async function createUserService (userInfo) {
     userInfo.newUserTelphone
   )
 
-  return { id: result.insertId, username: userInfo.newUserName, email: userInfo.newUserEmail }
+  return {
+    id: result.insertId,
+    username: userInfo.newUserName,
+    email: userInfo.newUserEmail
+  }
 }
 
 export async function loginUserService ({ email, password }) {

@@ -22,4 +22,5 @@ export async function getAllUsersRepository () {
 export async function getUserByIdRepository (id) {
   const [rows] = await getPool().query('SELECT id, username, email, telephone FROM users WHERE id = ? LIMIT 1', [id])
   return rows[0] || null
+  
 }
